@@ -26,7 +26,7 @@ function Contact() {
       formDataToSend.append('subject', formData.subject)
       formDataToSend.append('message', formData.message)
 
-      const response = await fetch('/public/forms/contact.php', {
+      const response = await fetch('/forms/contact.php', {
         method: 'POST',
         body: formDataToSend
       })

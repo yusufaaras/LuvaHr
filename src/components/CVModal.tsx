@@ -63,7 +63,7 @@ function CVModal({ show, onClose }: CVModalProps) {
       formDataToSend.append('to_email', 'arasy541@gmail.com')
       formDataToSend.append('subject', `Yeni CV Başvurusu: ${formData.name}`)
 
-      const response = await fetch('/public/forms/cv-send.php', {
+      const response = await fetch('/forms/cv-send.php', {
         method: 'POST',
         body: formDataToSend
       })

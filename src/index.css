@@ -2,13 +2,13 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 /* Import vendor styles */
-@import '/public/assets/vendor/bootstrap-icons/bootstrap-icons.css';
-@import '/public/assets/vendor/aos/aos.css';
-@import '/public/assets/vendor/glightbox/css/glightbox.min.css';
-@import '/public/assets/vendor/swiper/swiper-bundle.min.css';
+@import '/assets/vendor/bootstrap-icons/bootstrap-icons.css';
+@import '/assets/vendor/aos/aos.css';
+@import '/assets/vendor/glightbox/css/glightbox.min.css';
+@import '/assets/vendor/swiper/swiper-bundle.min.css';
 
 /* Import main template styles */
-@import '/public/assets/css/main.css';
+@import '/assets/css/main.css';
 
 /* Global styles */
 * {

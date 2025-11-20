@@ -2,7 +2,7 @@ function Hero() {
   return (
     <section id="hero" className="hero section">
       <div className="hero-bg">
-        <img src="/public/assets/img/hero-bg-light.webp" alt="" />
+        <img src="/assets/img/hero-bg-light.webp" alt="" />
       </div>
       <div className="container text-center">
         <div className="d-flex flex-column justify-content-center align-items-center">
@@ -16,7 +16,7 @@ function Hero() {
           <div className="d-flex" data-aos="fade-up" data-aos-delay="200">
           </div>
           <img 
-            src="/public/assets/img/home1.png" 
+            src="/assets/img/home1.png" 
             className="img-fluid hero-img" 
             alt="" 
             data-aos="zoom-out"

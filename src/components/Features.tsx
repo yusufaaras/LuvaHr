@@ -54,13 +54,13 @@ function Features() {
           <div className="col-lg-6">
             <div className="tab-content" data-aos="fade-up" data-aos-delay="200">
               <div className="tab-pane fade active show" id="features-tab-1">
-                <img src="/public/assets/img/uzmanlık.png" alt="" className="img-fluid" />
+                <img src="/assets/img/uzmanlık.png" alt="" className="img-fluid" />
               </div>
               <div className="tab-pane fade" id="features-tab-2">
-                <img src="/public/assets/img/tabs-2.jpeg" alt="" className="img-fluid" />
+                <img src="/assets/img/tabs-2.jpeg" alt="" className="img-fluid" />
               </div>
               <div className="tab-pane fade" id="features-tab-3">
-                <img src="/public/assets/img/tabs-3.jpeg" alt="" className="img-fluid" />
+                <img src="/assets/img/tabs-3.jpeg" alt="" className="img-fluid" />
               </div>
             </div>
           </div>

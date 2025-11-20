@@ -16,7 +16,7 @@ function Footer() {
       const formData = new FormData()
       formData.append('email', newsletterEmail)
 
-      const response = await fetch('/public/forms/newsletter.php', {
+      const response = await fetch('/forms/newsletter.php', {
         method: 'POST',
         body: formData
       })

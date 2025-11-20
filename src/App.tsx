@@ -45,10 +45,10 @@ function App() {
 
     // Load all vendor scripts
     Promise.all([
-      loadScript('/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js'),
-      loadScript('/public/assets/vendor/aos/aos.js'),
-      loadScript('/public/assets/vendor/glightbox/js/glightbox.min.js'),
-      loadScript('/public/assets/vendor/swiper/swiper-bundle.min.js'),
+      loadScript('/assets/vendor/bootstrap/js/bootstrap.bundle.min.js'),
+      loadScript('/assets/vendor/aos/aos.js'),
+      loadScript('/assets/vendor/glightbox/js/glightbox.min.js'),
+      loadScript('/assets/vendor/swiper/swiper-bundle.min.js'),
     ]).then(() => {
       // Initialize AOS
       if (window.AOS) {

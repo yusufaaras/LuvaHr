@@ -43,7 +43,7 @@ function MoreFeatures() {
           </div>
 
           <div className="features-image col-lg-5 order-1 order-lg-2" data-aos="fade-up" data-aos-delay="200">
-            <img src="/public/assets/img/features-3.jpeg" className="img-fluid" alt="" />
+            <img src="/assets/img/features-3.jpeg" className="img-fluid" alt="" />
           </div>
         </div>
       </div>
