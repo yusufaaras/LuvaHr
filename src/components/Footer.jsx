@@ -23,7 +23,7 @@ function Footer() {
       } else {
         setNewsletterStatus({ loading: false, error: 'Abonelik işlemi başarısız.', success: false });
       }
-    } catch (error) {
+    } catch {
       setNewsletterStatus({ loading: false, error: 'Abonelik işlemi başarısız.', success: false });
     }
   };

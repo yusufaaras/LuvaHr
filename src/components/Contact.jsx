@@ -35,7 +35,7 @@ function Contact() {
       } else {
         setFormStatus({ loading: false, error: 'Mesaj gönderilirken bir hata oluştu.', success: false });
       }
-    } catch (error) {
+    } catch {
       setFormStatus({ loading: false, error: 'Mesaj gönderilirken bir hata oluştu.', success: false });
     }
   };

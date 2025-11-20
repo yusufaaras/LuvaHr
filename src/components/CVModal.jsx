@@ -71,7 +71,7 @@ function CVModal({ isOpen, onClose }) {
       } else {
         setFormStatus({ loading: false, error: 'CV gönderilirken bir hata oluştu.', success: false });
       }
-    } catch (error) {
+    } catch {
       setFormStatus({ loading: false, error: 'CV gönderilirken bir hata oluştu.', success: false });
     }
   };
