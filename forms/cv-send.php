@@ -7,7 +7,7 @@
 // Eğer sunucunuzda ortam değişkeni yoksa, aşağıdaki $fallbackDatabaseUrl değişkenine
 // verdiğiniz bağlantı stringini koyabilirsiniz (kullanıcının verdiği örnek):
 // mysql://root:ysfars123321@127.0.0.1:3306/luvahrdb
-$databaseUrl = getenv('DATABASE_URL') ?: 'mysql://vegastak_luvahrdb:luvahr.2025@localhost:3306/luvahrdb';
+$databaseUrl = getenv('DATABASE_URL') ?: 'mysql://root:ysfars123321@127.0.0.1:3306/luvahrdb';
 // Parse DATABASE_URL
 function parseDatabaseUrl($url) {
     $parts = parse_url($url);
