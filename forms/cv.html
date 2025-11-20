@@ -1,74 +1,47 @@
 <!doctype html>
-<html lang="tr">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
   <title>CV Gönder</title>
-  <style>
-    /* Basit stiller, mevcut projeye uygun hale getirebilirsiniz */
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    form { max-width: 600px; margin: 0 auto; }
-    label { display:block; margin-top:10px; }
-    input, textarea, select { width:100%; padding:8px; box-sizing:border-box; }
-    button { margin-top:12px; padding:10px 16px; }
-    .msg { margin-top:12px; }
-  </style>
 </head>
 <body>
   <h1>CV Gönder</h1>
   <form id="cvForm">
-    <label>İsim
-      <input type="text" name="firstName" required />
-    </label>
-    <label>Soyisim
-      <input type="text" name="lastName" required />
-    </label>
-    <label>E-posta
-      <input type="email" name="email" required />
-    </label>
-    <label>Cep Telefonu
-      <input type="tel" name="phone" required />
-    </label>
-    <label>Uzmanlık
-      <input type="text" name="expertise" required />
-    </label>
+    <label>İsim: <input type="text" name="firstName" required></label><br>
+    <label>Soyisim: <input type="text" name="lastName" required></label><br>
+    <label>Email: <input type="email" name="email" required></label><br>
+    <label>Telefon: <input type="text" name="phone" required></label><br>
+    <label>CV: <input type="file" name="cvFile" accept=".pdf,.doc,.docx,.odt" required></label><br>
     <button type="submit">Gönder</button>
-    <div class="msg" id="message"></div>
   </form>
 
-  <script>
-    const form = document.getElementById('cvForm');
-    const msg = document.getElementById('message');
+  <div id="result"></div>
 
-    form.addEventListener('submit', async (e) => {
+  <script>
+    document.getElementById('cvForm').addEventListener('submit', async function (e) {
       e.preventDefault();
-      msg.textContent = 'Gönderiliyor...';
-      const data = {
-        firstName: form.firstName.value.trim(),
-        lastName: form.lastName.value.trim(),
-        email: form.email.value.trim(),
-        phone: form.phone.value.trim(),
-        expertise: form.expertise.value.trim()
-      };
+      const fd = new FormData(e.target);
+
+      // Eğer backend'i kendi Express'in üzerinden (aynı origin) çalıştırıyorsan:
+      // const url = '/api/cv';
+
+      // Eğer frontend Live Server (127.0.0.1:5500) açık ve backend 3000'deyse:
+      const url = 'http://localhost:3000/api/cv';
+
       try {
-        const res = await fetch('/api/cvs', {
+        const res = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: fd
         });
-        const json = await res.json();
-        if (!res.ok) {
-          msg.textContent = json.error || 'Hata oluştu';
-          msg.style.color = 'red';
-          return;
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById('result').innerText = 'Başarı: ' + JSON.stringify(data);
+          e.target.reset();
+        } else {
+          document.getElementById('result').innerText = 'Hata: ' + (data.error || JSON.stringify(data));
         }
-        msg.textContent = 'CV başarıyla gönderildi.';
-        msg.style.color = 'green';
-        form.reset();
       } catch (err) {
-        console.error(err);
-        msg.textContent = 'Sunucuya bağlanamadı';
-        msg.style.color = 'red';
+        document.getElementById('result').innerText = 'İstek hatası: ' + err.message;
       }
     });
   </script>
