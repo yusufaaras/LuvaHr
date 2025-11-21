@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { cvApi } from '../../services/api';
 
 const CVUploadModal = ({ isOpen, onClose }) => {
@@ -11,6 +11,7 @@ const CVUploadModal = ({ isOpen, onClose }) => {
   const [file, setFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const fileInputRef = useRef(null);
 
   const handleChange = (e) => {
     setFormData({
@@ -46,8 +47,10 @@ const CVUploadModal = ({ isOpen, onClose }) => {
           section_title: '',
         });
         setFile(null);
-        // Reset file input
-        document.getElementById('cv_file').value = '';
+        // Reset file input using ref
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       } else {
         alert(response.message || 'CV gönderilirken bir hata oluştu.');
       }
@@ -145,6 +148,7 @@ const CVUploadModal = ({ isOpen, onClose }) => {
                       required
                       className="form-control"
                       onChange={handleFileChange}
+                      ref={fileInputRef}
                     />
                   </div>
                   <div className="col-12">

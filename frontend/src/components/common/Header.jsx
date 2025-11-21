@@ -19,7 +19,7 @@ const Header = ({ onCvModalOpen }) => {
         </nav>
 
         <a className="btn-getstarted" href="#" onClick={onCvModalOpen}>
-          Cv Gönder
+          CV Gönder
         </a>
       </div>
     </header>

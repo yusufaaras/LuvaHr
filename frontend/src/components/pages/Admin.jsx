@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { cvApi } from '../../services/api';
 
 const Admin = () => {
@@ -12,17 +12,7 @@ const Admin = () => {
   const [editingCv, setEditingCv] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cvs, filters]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
       const result = await cvApi.getAll();
@@ -30,13 +20,17 @@ const Admin = () => {
       setCvs(data);
     } catch (error) {
       console.error('Error loading CVs:', error);
-      alert('Veri alınırken hata oluştu. Konsolu kontrol edin.');
+      alert('Veri yüklenirken bir hata oluştu.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const applyFilters = () => {
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const applyFilters = useCallback(() => {
     let filtered = [...cvs];
 
     if (filters.expertise) {
@@ -54,7 +48,11 @@ const Admin = () => {
     }
 
     setFilteredCvs(filtered);
-  };
+  }, [cvs, filters]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
 
   const getExpertiseField = (row) => {
     return (
