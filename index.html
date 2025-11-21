@@ -540,36 +540,18 @@
                 referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
             <div class="col-lg-6">
-              <form action="forms/cv-send.php" method="post" enctype="multipart/form-data"
-                class="cv-modal-form php-email-form">
-                <div class="row gy-4">
-
-                  <div class="col-md-6">
-                    <input type="text" name="name" class="form-control" placeholder="Adınız" required="">
-                  </div>
-
-                  <div class="col-md-6 ">
-                    <input type="email" class="form-control" name="email" placeholder="E-posta Adresiniz" required="">
-                  </div>
-
-                  <div class="col-md-12">
-                    <input type="text" class="form-control" name="subject" placeholder="Konu" required="">
-                  </div>
-
-                  <div class="col-md-12">
-                    <textarea class="form-control" name="message" rows="6" placeholder="Mesajınız"
-                      required=""></textarea>
-                  </div>
-
-                  <div class="col-md-12 text-center">
-                    <div class="loading">Yükleniyor</div>
-                    <div class="error-message"></div>
-                    <div class="sent-message">Mesajınız başarıyla gönderildi. Teşekkür ederiz!</div>
-
-                    <button type="submit">Mesaj Gönder</button>
-                  </div>
-
-                </div>
+              <form action="/api/submit-cv" method="post" enctype="multipart/form-data" class="cvi-modal-form">
+                <!-- input'larınızın name atribütleri aşağıdakine benzer olmalı -->
+                <input type="text" name="name" id="name" placeholder="Adınız" required>
+                <input type="email" name="email" id="email" placeholder="E-posta" required>
+                <input type="text" name="phone" id="phone" placeholder="Telefon (opsiyonel)">
+                <input type="text" name="subject" id="subject" placeholder="Konu (opsiyonel)">
+                <textarea name="message" id="message" placeholder="Mesaj (opsiyonel)"></textarea>
+              
+                <!-- Dosya input'unuzun name'i aşağıdaki gibi olmalı -->
+                <input type="file" name="cv_file" id="cv_file" accept=".pdf,.doc,.docx" required>
+              
+                <button type="submit">Gönder</button>
               </form>
             </div>
           </div>
@@ -662,50 +644,12 @@
         </div>
 
         <div class="modal-body pt-3">
-          <form action="forms/cv-send.php" method="post" enctype="multipart/form-data"
-            class="cv-modal-form php-email-form">
-            <div class="row">
-              <div class="col-md-12 mb-3">
-                <label for="name">Ad Soyad</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="Boran Demir" required>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label for="email">E-posta</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="me@example.com" required>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label for="phone">Cep Telefonu</label>
-                <input type="tel" class="form-control" id="phone" name="phone" placeholder="05xx xxx xx xx">
-              </div>
-
-              <div class="col-md-12 mb-3">
-                <label for="expertise">Uzmanlığınız</label>
-                <input type="text" class="form-control" id="expertise" name="expertise"
-                  placeholder="Satış Yöneticisi / Yazılımcı / Muhasebe Uzmanı" required>
-              </div>
-
-              <div class="col-md-12 mb-4">
-                <label for="cv_file_upload">CV Yükleyin</label>
-                <div class="custom-file-upload">
-                  <label for="cv_file_upload" class="custom-file-input-label">Dosya Seç</label>
-                  <input type="file" id="cv_file_upload" name="cv_file" required
-                    onchange="document.getElementById('file-name').innerText = this.files[0].name">
-                  <div id="file-name" class="file-name-display">Dosya seçilmedi</div>
-                </div>
-              </div>
-
-              <input type="hidden" name="to_email" value="arasy541@gmail.com">
-              <input type="hidden" name="subject" value="Yeni CV Başvurusu: [Ad Soyad]">
-
-              <div class="col-md-12">
-                <div class="loading">Yükleniyor</div>
-                <div class="error-message"></div>
-                <div class="sent-message">CV'niz başarıyla gönderildi. Teşekkür ederiz!</div>
-                <button type="submit" class="btn-gonder">Gönder</button>
-              </div>
-            </div>
+          <form action="/forms/cv-send" method="post" enctype="multipart/form-data" class="cvi-modal-form">
+            <input type="text" name="name" id="name" placeholder="Adınız" required>
+            <input type="email" name="email" id="email" placeholder="E-posta" required>
+            <input type="text" name="phone" id="phone" placeholder="Telefon (opsiyonel)">
+            <input type="file" name="cvFile" id="cv_file" accept=".pdf,.doc,.docx" required>
+            <button type="submit">Gönder</button>
           </form>
         </div>
       </div>

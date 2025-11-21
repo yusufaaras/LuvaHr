@@ -1,0 +1,16 @@
+{
+  "name": "luvahr-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.15.3",
+    "sqlite3": "^5.1.7"
+  }
+}
