@@ -216,20 +216,34 @@ app.get('/download/:id', async (req, res) => {
   }
 });
 
-// Statik dosyaları sun (index.html proje kökündeyse)
-// Eğer SPA ise API rotalarından farklı olarak index.html dönüşü için fallback eklenir
-app.use('/', express.static(path.join(__dirname)));
+// Statik dosyaları sun - React build'i veya geliştirme modunda frontend
+// Production'da: frontend/dist klasöründen build edilmiş dosyaları sun
+// Development'ta: Vite dev server üzerinden çalıştır (proxy ile)
+const frontendDistPath = path.join(__dirname, 'frontend', 'dist');
+if (fsSync.existsSync(frontendDistPath)) {
+  // Production mode: serve React build
+  app.use(express.static(frontendDistPath));
+} else {
+  // Development mode: serve old static files for backward compatibility
+  app.use('/', express.static(path.join(__dirname)));
+}
 
-// 404 handler: API için JSON, diğerleri için index.html veya basit 404 sayfa
+// 404 handler: API için JSON, diğerleri için React SPA fallback veya 404 sayfa
 app.use((req, res, next) => {
   if (req.path.startsWith('/api') || req.path.startsWith('/forms') || req.path.startsWith('/download')) {
     return res.status(404).json({ ok: false, message: 'Not Found' });
   }
-  // SPA fallback: index.html sun
-  const indexPath = path.join(__dirname, 'index.html');
-  if (fsSync.existsSync(indexPath)) {
-    return res.sendFile(indexPath);
+  
+  // SPA fallback: React index.html veya eski index.html sun
+  const reactIndexPath = path.join(frontendDistPath, 'index.html');
+  const oldIndexPath = path.join(__dirname, 'index.html');
+  
+  if (fsSync.existsSync(reactIndexPath)) {
+    return res.sendFile(reactIndexPath);
+  } else if (fsSync.existsSync(oldIndexPath)) {
+    return res.sendFile(oldIndexPath);
   }
+  
   return res.status(404).send('Not Found');
 });
 
