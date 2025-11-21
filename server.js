@@ -1,4 +1,4 @@
-// server.js - Express routerlar MongoDB ile çalışacak şekilde güncellendi
+// server.js - Express routerlar MongoDB ile çalışacak şekilde güncellendi (robust + proxy-aware + graceful shutdown)
 const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
@@ -10,25 +10,37 @@ const dbPromise = require('./db');
 
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Eğer nginx/Cloudflare vb. arkasındaysanız bu gerekli (X-Forwarded-* doğru çalışsın)
+app.set('trust proxy', true);
 
-// Include upload router
+// Body parser - json limit ihtiyaca göre ayarlayın
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Include upload router (multer) - içinde DB kontrolü var
 const cvUpload = require('./cv-upload');
 app.use(cvUpload);
 
 // Basit sağlık kontrolü
 app.get('/ping', (req, res) => res.send('pong'));
 
+// Helper: DB yoksa 503 döndür
+function ensureDb(res, db) {
+  if (!db) {
+    res.status(503).json({ ok: false, message: 'Database not available. Try again later.' });
+    return false;
+  }
+  return true;
+}
+
 // GET /api/cvs - tüm kayıtları çek
 app.get('/api/cvs', async (req, res) => {
   try {
     const db = await dbPromise;
+    if (!ensureDb(res, db)) return;
     const coll = db.collection('cvs');
     const rows = await coll.find({}).sort({ created_at: -1 }).toArray();
 
-    // Frontend beklediği shape: id, name, email, phone, filename, filepath, section_title, expertise, created_at
     const mapped = rows.map(r => ({
       id: r._id.toString(),
       name: r.name || '',
@@ -64,6 +76,7 @@ app.put('/api/cvs/:id', requireAdmin, async (req, res) => {
   const { name, email, phone, expertise, section_title } = req.body;
   try {
     const db = await dbPromise;
+    if (!ensureDb(res, db)) return;
     const coll = db.collection('cvs');
 
     let oid;
@@ -78,7 +91,6 @@ app.put('/api/cvs/:id', requireAdmin, async (req, res) => {
         name: name || '',
         email: email || '',
         phone: phone || '',
-        // tercih: ayrı expertise alanı varsa onu güncelle, yoksa section_title'e koy
         expertise: expertise || section_title || ''
       }
     };
@@ -98,6 +110,7 @@ app.delete('/api/cvs/:id', requireAdmin, async (req, res) => {
 
   try {
     const db = await dbPromise;
+    if (!ensureDb(res, db)) return;
     const coll = db.collection('cvs');
 
     let oid;
@@ -112,7 +125,6 @@ app.delete('/api/cvs/:id', requireAdmin, async (req, res) => {
       return res.status(404).json({ ok: false, message: 'Kayıt bulunamadı' });
     }
 
-    // Dosya yolu
     let candidatePath = '';
     if (doc.filepath) {
       candidatePath = path.resolve(path.join(__dirname, doc.filepath));
@@ -122,7 +134,6 @@ app.delete('/api/cvs/:id', requireAdmin, async (req, res) => {
 
     let fileDeleted = false;
     if (candidatePath) {
-      // Güvenlik: sadece uploads dizini altındaki dosyalara izin ver
       const normalizedUploads = uploadsDir + path.sep;
       if (!candidatePath.startsWith(normalizedUploads) && candidatePath !== uploadsDir) {
         console.warn('Dosya yolu uploads dizini dışında:', candidatePath);
@@ -155,6 +166,7 @@ app.get('/download/:id', async (req, res) => {
     const uploadsDir = path.resolve(path.join(__dirname, 'uploads'));
 
     const db = await dbPromise;
+    if (!ensureDb(res, db)) return;
     const coll = db.collection('cvs');
 
     let oid;
@@ -187,7 +199,6 @@ app.get('/download/:id', async (req, res) => {
       return res.status(400).send('İzin verilmeyen dosya yolu');
     }
 
-    // res.download yerine fs.exists kontrolü yapıp stream de atabilirsiniz
     if (!fsSync.existsSync(filePath)) {
       return res.status(404).send('Dosya bulunamadı');
     }
@@ -206,10 +217,66 @@ app.get('/download/:id', async (req, res) => {
 });
 
 // Statik dosyaları sun (index.html proje kökündeyse)
+// Eğer SPA ise API rotalarından farklı olarak index.html dönüşü için fallback eklenir
 app.use('/', express.static(path.join(__dirname)));
 
-// Server start
+// 404 handler: API için JSON, diğerleri için index.html veya basit 404 sayfa
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/forms') || req.path.startsWith('/download')) {
+    return res.status(404).json({ ok: false, message: 'Not Found' });
+  }
+  // SPA fallback: index.html sun
+  const indexPath = path.join(__dirname, 'index.html');
+  if (fsSync.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  return res.status(404).send('Not Found');
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  if (res.headersSent) return next(err);
+  res.status(500).json({ ok: false, message: 'Internal server error' });
+});
+
+// Server start + graceful shutdown
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server çalışıyor: http://localhost:${PORT}`);
 });
+
+server.on('error', (err) => {
+  console.error('Server error:', err);
+  process.exit(1);
+});
+
+// Graceful shutdown: close DB client if present
+async function shutdown(signal) {
+  console.log(`Received ${signal}. Shutting down gracefully...`);
+  try {
+    const db = await dbPromise;
+    if (db && db.s && db.s.client) {
+      try {
+        await db.s.client.close();
+        console.log('MongoDB client closed.');
+      } catch (e) {
+        console.warn('Error closing MongoDB client:', e.message || e);
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+  server.close(() => {
+    console.log('HTTP server closed.');
+    process.exit(0);
+  });
+  // Force exit after 10s
+  setTimeout(() => {
+    console.error('Forcing shutdown.');
+    process.exit(1);
+  }, 10000);
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
