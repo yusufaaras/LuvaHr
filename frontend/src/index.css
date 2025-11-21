@@ -1,0 +1,116 @@
+/* Custom styles for LuvaHr React App */
+
+:root {
+  --luva-primary: #521e6a;
+  --luva-white: #ffffff;
+}
+
+/* CV Modal styles */
+.modal-content {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal-header {
+  background: var(--luva-primary);
+  color: var(--luva-white);
+  border-bottom: none;
+  padding: 1.25rem 1.5rem;
+  align-items: center;
+}
+
+.modal-header .modal-title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.modal-body {
+  background: var(--luva-white);
+  color: #222;
+  padding: 1.5rem;
+}
+
+/* Form fields */
+.form-control {
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #e6e6e6;
+  box-shadow: none;
+}
+
+.btn-submit-cv {
+  background: var(--luva-primary);
+  color: var(--luva-white);
+  border: none;
+  font-weight: 600;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.btn-submit-cv:disabled {
+  opacity: 0.7;
+}
+
+.btn-ok {
+  background: var(--luva-primary);
+  color: var(--luva-white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+
+/* Hero section */
+#hero {
+  background-image: url('/assets/img/home1.svg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  -webkit-background-size: cover;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  background-attachment: scroll;
+}
+
+#hero .container {
+  width: 100%;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+#hero h1 {
+  margin: 0 0 0.5rem 0;
+  line-height: 1.05;
+  font-size: clamp(1.6rem, 4vw, 3rem);
+}
+
+#hero p {
+  margin: 0;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
+  #hero {
+    background-position: center 30%;
+    min-height: 75vh;
+    padding: 2.5rem 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+  #hero h1 {
+    font-size: 1.4rem;
+  }
+  #hero p {
+    font-size: 0.95rem;
+  }
+}
