@@ -3,7 +3,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const dbPromise = require('./db');
+const dbPromise = require('../db');
 
 const uploadDir = path.join(__dirname, '../uploads', 'cvs');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
