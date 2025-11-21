@@ -1,79 +1,48 @@
-const mysql = require('mysql2/promise');
+// db.js - MongoDB bağlantısı, promise olarak Db instance döner
+// Kullanım: const db = await dbPromise; const coll = db.collection('cvs');
+
+const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
-const {
-  DB_HOST = 'localhost',
-  DB_USER = 'root',
-  DB_PASSWORD = '',
-  DB_NAME = 'luvahr',
-  DB_PORT = 3306
-} = process.env;
+const MONGO_URI = process.env.MONGO_URI;
+const MONGO_DB_NAME = process.env.MONGO_DB_NAME || 'luvahr';
 
-let pool;
-
-async function init() {
-  // Pool oluştur (db belirtilen ise doğrudan ona bağlanır)
-  pool = mysql.createPool({
-    host: DB_HOST,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    database: DB_NAME,
-    port: DB_PORT,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    charset: 'utf8mb4'
-  });
-
-  // Tabloyu oluştur (uygulama başladığında)
-  const createTableSQL = `
-    CREATE TABLE IF NOT EXISTS cvs (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(255),
-      email VARCHAR(255),
-      phone VARCHAR(50),
-      filename VARCHAR(512),
-      filepath VARCHAR(1024),
-      section_title VARCHAR(255),
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-  `;
-
-  const conn = await pool.getConnection();
-  try {
-    await conn.query(createTableSQL);
-
-    // Eğer MySQL sürümünüz ALTER ... ADD COLUMN IF NOT EXISTS destekliyorsa bu çalışır,
-    // aksi halde hata vermezse atlanabilir. Yine de güvenli olması için kontrol yapıyoruz.
-    try {
-      await conn.query(`ALTER TABLE cvs ADD COLUMN IF NOT EXISTS section_title VARCHAR(255)`);
-    } catch (alterErr) {
-      // Eğer "IF NOT EXISTS" desteklenmiyorsa, sütunun olup olmadığını kontrol edip ekleyebiliriz
-      try {
-        const [rows] = await conn.query(`SHOW COLUMNS FROM cvs LIKE 'section_title'`);
-        if (!rows || rows.length === 0) {
-          await conn.query(`ALTER TABLE cvs ADD COLUMN section_title VARCHAR(255)`);
-        }
-      } catch (innerErr) {
-        console.warn('section_title sütunu kontrol/ekleme sırasında hata:', innerErr);
-      }
-    }
-
-    console.log('MySQL bağlantısı kuruldu ve tablo "cvs" hazır.');
-  } finally {
-    conn.release();
-  }
-
-  return pool;
+if (!MONGO_URI) {
+  console.error('MONGO_URI environment variable is required. See .env.example');
+  process.exit(1);
 }
 
-// Başlatma: require edildiğinde init'i çalıştır ve pool'u döndür
+let client;
+
+async function init() {
+  // Not: modern mongodb driver (v4+) için useNewUrlParser/useUnifiedTopology gibi legacy opsiyonlar
+  // artık desteklenmiyor — bu yüzden opsiyonları boş bırakıyoruz.
+  client = new MongoClient(MONGO_URI);
+
+  await client.connect();
+  const db = client.db(MONGO_DB_NAME);
+
+  // Koleksiyon ve indeksleri oluştur/garanti et
+  const coll = db.collection('cvs');
+  try {
+    // created_at için index (sorgularda sıralama için faydalı)
+    await coll.createIndex({ created_at: -1 });
+    // email gibi alanlara index isterseniz ekleyin: await coll.createIndex({ email: 1 });
+  } catch (err) {
+    console.warn('Index oluşturma sırasında uyarı:', err.message);
+  }
+
+  console.log(`MongoDB connected to ${MONGO_DB_NAME}`);
+  return db;
+}
+
+// Başlatma: module.exports bir Promise döner (requiring modülün hemen DB'ye bağlanmasını sağlar)
 module.exports = (async () => {
   try {
-    const p = await init();
-    return p;
+    return await init();
   } catch (err) {
     console.error('DB init hatası:', err);
+    // Hata fırlatıyoruz ki çağıran kod (server) bilebilsin; isterseniz burada process.exit(1) de kullanabilirsiniz.
     throw err;
   }
 })();
