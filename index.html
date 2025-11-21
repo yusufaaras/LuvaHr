@@ -644,11 +644,13 @@
         </div>
 
         <div class="modal-body pt-3">
-          <form action="/forms/cv-send" method="post" enctype="multipart/form-data" class="cvi-modal-form">
+          <form id="cvForm" action="/forms/cv-send" method="post" enctype="multipart/form-data" class="cvi-modal-form">
             <input type="text" name="name" id="name" placeholder="Adınız" required>
             <input type="email" name="email" id="email" placeholder="E-posta" required>
             <input type="text" name="phone" id="phone" placeholder="Telefon (opsiyonel)">
             <input type="file" name="cvFile" id="cv_file" accept=".pdf,.doc,.docx" required>
+            <input type="text" name="section_title" placeholder="uzmanlıklarınız">
+        
             <button type="submit">Gönder</button>
           </form>
         </div>

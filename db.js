@@ -34,6 +34,7 @@ async function init() {
       phone VARCHAR(50),
       filename VARCHAR(512),
       filepath VARCHAR(1024),
+      section_title VARCHAR(255),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `;
@@ -41,6 +42,23 @@ async function init() {
   const conn = await pool.getConnection();
   try {
     await conn.query(createTableSQL);
+
+    // Eğer MySQL sürümünüz ALTER ... ADD COLUMN IF NOT EXISTS destekliyorsa bu çalışır,
+    // aksi halde hata vermezse atlanabilir. Yine de güvenli olması için kontrol yapıyoruz.
+    try {
+      await conn.query(`ALTER TABLE cvs ADD COLUMN IF NOT EXISTS section_title VARCHAR(255)`);
+    } catch (alterErr) {
+      // Eğer "IF NOT EXISTS" desteklenmiyorsa, sütunun olup olmadığını kontrol edip ekleyebiliriz
+      try {
+        const [rows] = await conn.query(`SHOW COLUMNS FROM cvs LIKE 'section_title'`);
+        if (!rows || rows.length === 0) {
+          await conn.query(`ALTER TABLE cvs ADD COLUMN section_title VARCHAR(255)`);
+        }
+      } catch (innerErr) {
+        console.warn('section_title sütunu kontrol/ekleme sırasında hata:', innerErr);
+      }
+    }
+
     console.log('MySQL bağlantısı kuruldu ve tablo "cvs" hazır.');
   } finally {
     conn.release();
