@@ -28,104 +28,96 @@
   <link href="assets/css/main.css" rel="stylesheet">
 
   <style>
-    /* CV Modal için özel stiller */
-    .cv-modal-content {
-      background-color: #383838;
-      /* Görseldeki koyu gri arka plan */
-      color: white;
-      padding: 40px;
-      border-radius: 10px;
+    :root {
+      --luva-primary: #521e6a;
+      --luva-white: #ffffff;
     }
 
-    .cv-modal-header h2 {
-      color: white;
+    /* CV Modal için güncel stiller (Bootstrap ile uyumlu) */
+    #cvModal .modal-content {
+      border: none;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    #cvModal .modal-header {
+      background: var(--luva-primary);
+      color: var(--luva-white);
+      border-bottom: none;
+      padding: 1.25rem 1.5rem;
+      align-items: center;
+    }
+
+    #cvModal .modal-header .modal-title {
+      margin: 0;
       font-weight: 700;
     }
 
-    .cv-modal-header p {
-      color: #9ac836;
-      /* Yeşil renkli slogan */
+    #cvModal .modal-body {
+      background: var(--luva-white);
+      color: #222;
+      padding: 1.5rem;
     }
 
-    .cv-modal-form .form-control {
-      background-color: white;
-      color: #383838;
-      border: 1px solid #ced4da;
+    /* Form alanları */
+    #cvForm .form-control {
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid #e6e6e6;
+      box-shadow: none;
     }
 
-    .cv-modal-form .form-group {
-      margin-bottom: 20px;
-    }
-
-    .cv-modal-form label {
-      color: #d1d1d1;
-      /* Alan başlıkları için açık gri */
-      margin-bottom: 5px;
-      display: block;
-    }
-
-    .cv-modal-form .btn-gonder {
-      background-color: #9ac836;
-      /* Görseldeki yeşil buton */
-      color: white;
+    #cvForm .btn-submit-cv {
+      background: var(--luva-primary);
+      color: var(--luva-white);
       border: none;
-      padding: 10px 30px;
       font-weight: 600;
-      transition: background-color 0.3s;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
       width: 100%;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .cv-modal-form .btn-gonder:hover {
-      background-color: #83b02b;
+    #cvForm .btn-submit-cv:disabled {
+      opacity: 0.7;
     }
 
-    .cv-modal-form .custom-file-upload {
-      display: flex;
+    /* success modal */
+    #cvSuccessModal .modal-content {
+      border-radius: 12px;
     }
 
-    .cv-modal-form .custom-file-input-label {
-      background-color: #8a2be2;
-      /* Mor renk */
-      color: white;
-      padding: 8px 15px;
-      border-radius: 4px 0 0 4px;
-      cursor: pointer;
-      font-size: 14px;
-      white-space: nowrap;
-    }
-
-    .cv-modal-form .custom-file-input-label:hover {
-      background-color: #6a1ac4;
-    }
-
-    .cv-modal-form .file-name-display {
-      flex-grow: 1;
-      background-color: white;
-      color: #383838;
-      padding: 8px 12px;
-      border-radius: 0 4px 4px 0;
-      border: 1px solid #ced4da;
-      border-left: none;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .cv-modal-form input[type="file"] {
-      display: none;
-    }
-
-    /* Modalın kendisi için koyu arka plan */
-    #cvModal .modal-dialog {
-      max-width: 600px;
-      margin: 1.75rem auto;
-    }
-
-    #cvModal .modal-content {
-      background-color: #383838;
-      /* Modal içeriği koyu gri */
+    #cvSuccessModal .btn-ok {
+      background: var(--luva-primary);
+      color: var(--luva-white);
       border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+    }
+
+    /* küçük ekranlarda modal genişletme */
+    @media (max-width: 576px) {
+      #cvModal .modal-dialog {
+        margin: 0.5rem;
+      }
+    }
+  </style>
+  <style>
+    #hero {
+      /* Resminizi arka plan olarak ayarlayın. */
+      background: url('assets/img/home1.svg') center center no-repeat;
+
+      /* Arka plan resminin tüm alanı kaplamasını sağlar. */
+      background-size: cover;
+
+      /* İçeriğin üstüne gelebilmesi için göreceli konumlandırma. */
+      position: relative;
+
+      /* Ekranı tam kaplaması için minimum yükseklik (örnek: tam ekran yüksekliği). */
+      min-height: 100vh;
+
+      /* İçerik ve arka plan arasında dikey hizalama. */
+      display: flex;
+      align-items: center;
     }
   </style>
 
@@ -158,22 +150,18 @@
   <main class="main">
 
     <section id="hero" class="hero section">
-      <div class="hero-bg">
-        <img src="assets/img/hero-bg-light.webp" alt="">
-      </div>
-      <div class="container text-center">
-        <div class="d-flex flex-column justify-content-center align-items-center">
-          <h1 data-aos="fade-up"><span>LuvaHr'a Hoş Geldiniz</span></h1>
-          <p data-aos="fade-up" data-aos-delay="100">İhtiyaç duyduğunuz doğru yetenekleri doğru fırsatlarla
+                  <div class="container text-center">
+                <div class="d-flex flex-column justify-content-center align-items-center">
+                    <h1 data-aos="fade-up"><span>LuvaHr'a Hoş Geldiniz</span></h1>
+                    <p data-aos="fade-up" data-aos-delay="100">İhtiyaç duyduğunuz doğru yetenekleri doğru fırsatlarla
             buluşturuyoruz.<br></p>
-          <div class="d-flex" data-aos="fade-up" data-aos-delay="200"> 
-          </div>
-          <img src="assets/img/home1.png" class="img-fluid hero-img" alt="" data-aos="zoom-out"
-            data-aos-delay="300">
-        </div>
-      </div>
+                    <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
+                      </div>
+                  </div>
+              </div>
 
-    </section>
+          </section>
+
     <section id="featured-services" class="featured-services section light-background">
 
       <div class="container">
@@ -215,40 +203,40 @@
       </div>
 
     </section>
-   <section id="about" class="about section">
+    <section id="about" class="about section">
 
-  <div class="container">
+      <div class="container">
 
-    <div class="row gy-4">
+        <div class="row gy-4">
 
-      <div class="col-lg-12 content" data-aos="fade-up" data-aos-delay="100">
-        <p class="who-we-are">Biz Kimiz</p>
-        <h3>İşe Alımı Daha Profesyonel, Hızlı ve Öngörülebilir Hale Getiriyoruz</h3>
-        <p class="fst-italic">
-          İnsan kaynakları dünyasında edindiğimiz yıllara dayanan deneyim boyunca, şirketlerin büyümesinde en kritik
-          unsurun doğru insanları doğru rollerle buluşturmak olduğunu deneyimledik. Sahip olduğumuz geçmiş deneyim
-          ve farklı sektörlerde yürüttüğümüz işe alım süreçleri, bize hem aday tarafını hem işveren tarafını çok iyi
-          anlama yeteneği kazandırdı.
-        </p>
-        <ul>
-          <li><i class="bi bi-check-circle"></i> <span>Bugün LuvaHR’da, her müşterimizin kültürünü, değerlerini ve
-              ihtiyaçlarını derinlemesine anlayarak, yalnızca pozisyona değil ekip dinamiğine de uyum sağlayacak
-              doğru yetenekleri bulmaya odaklanıyoruz.</span></li>
-          <li><i class="bi bi-check-circle"></i> <span>İletişime önem veren, şeffaf çalışan ve aday deneyimini
-              merkeze koyan bir yaklaşım benimsiyoruz.</span></li>
-          <li><i class="bi bi-check-circle"></i> <span>LuvaHR'ı kurma amacımız; işe alım sürecini firmalar için daha
-              profesyonel, daha hızlı ve daha öngörülebilir hale getirmekti.</span></li>
-          <li><i class="bi bi-check-circle"></i> <span>İyi bir işe alım süreci, yalnızca bir pozisyon doldurmak
-              değil; şirketin geleceğine değer katmaktır.</span></li>
-        </ul>
-        <a href="#" class="read-more" data-bs-toggle="modal" data-bs-target="#cvModal"><span>Cv Gönder</span><i
-            class="bi bi-arrow-right"></i></a>
-      </div> 
+          <div class="col-lg-12 content" data-aos="fade-up" data-aos-delay="100">
+            <p class="who-we-are">Biz Kimiz</p>
+            <h3>İşe Alımı Daha Profesyonel, Hızlı ve Öngörülebilir Hale Getiriyoruz</h3>
+            <p class="fst-italic">
+              İnsan kaynakları dünyasında edindiğimiz yıllara dayanan deneyim boyunca, şirketlerin büyümesinde en kritik
+              unsurun doğru insanları doğru rollerle buluşturmak olduğunu deneyimledik. Sahip olduğumuz geçmiş deneyim
+              ve farklı sektörlerde yürüttüğümüz işe alım süreçleri, bize hem aday tarafını hem işveren tarafını çok iyi
+              anlama yeteneği kazandırdı.
+            </p>
+            <ul>
+              <li><i class="bi bi-check-circle"></i> <span>Bugün LuvaHR’da, her müşterimizin kültürünü, değerlerini ve
+                  ihtiyaçlarını derinlemesine anlayarak, yalnızca pozisyona değil ekip dinamiğine de uyum sağlayacak
+                  doğru yetenekleri bulmaya odaklanıyoruz.</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>İletişime önem veren, şeffaf çalışan ve aday deneyimini
+                  merkeze koyan bir yaklaşım benimsiyoruz.</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>LuvaHR'ı kurma amacımız; işe alım sürecini firmalar için daha
+                  profesyonel, daha hızlı ve daha öngörülebilir hale getirmekti.</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>İyi bir işe alım süreci, yalnızca bir pozisyon doldurmak
+                  değil; şirketin geleceğine değer katmaktır.</span></li>
+            </ul>
+            <a href="#" class="read-more" data-bs-toggle="modal" data-bs-target="#cvModal"><span>Cv Gönder</span><i
+                class="bi bi-arrow-right"></i></a>
+          </div>
 
-    </div>
+        </div>
 
-  </div>
-</section>
+      </div>
+    </section>
     <section id="clients" class="clients section" style="display: none;">
 
       <div class="container" data-aos="fade-up">
@@ -360,7 +348,7 @@
 
       </div>
 
-    </section> 
+    </section>
     <section id="more-features" class="more-features section">
 
       <div class="container">
@@ -547,10 +535,10 @@
                 <input type="text" name="phone" id="phone" placeholder="Telefon (opsiyonel)">
                 <input type="text" name="subject" id="subject" placeholder="Konu (opsiyonel)">
                 <textarea name="message" id="message" placeholder="Mesaj (opsiyonel)"></textarea>
-              
+
                 <!-- Dosya input'unuzun name'i aşağıdaki gibi olmalı -->
                 <input type="file" name="cv_file" id="cv_file" accept=".pdf,.doc,.docx" required>
-              
+
                 <button type="submit">Gönder</button>
               </form>
             </div>
@@ -633,26 +621,61 @@
   <div id="preloader"></div>
 
 
+  <!-- CV Modal (Güncellenmiş tasarım) -->
   <div class="modal fade" id="cvModal" tabindex="-1" aria-labelledby="cvModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
 
-        <div class="modal-header border-0 pb-0 d-block text-center cv-modal-header">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cvModalLabel">CV Gönder</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
-          <h2 class="modal-title" id="cvModalLabel">CV Gönder</h2>
-          <p>Kariyerinize yeni bir yön vermeye ne dersiniz?</p>
         </div>
 
-        <div class="modal-body pt-3">
-          <form id="cvForm" action="/forms/cv-send" method="post" enctype="multipart/form-data" class="cvi-modal-form">
-            <input type="text" name="name" id="name" placeholder="Adınız" required>
-            <input type="email" name="email" id="email" placeholder="E-posta" required>
-            <input type="text" name="phone" id="phone" placeholder="Telefon (opsiyonel)">
-            <input type="file" name="cvFile" id="cv_file" accept=".pdf,.doc,.docx" required>
-            <input type="text" name="section_title" placeholder="uzmanlıklarınız">
-        
-            <button type="submit">Gönder</button>
+        <div class="modal-body">
+          <p class="text-muted">Kariyerinize yeni bir yön vermeye ne dersiniz? Aşağıdan CV'nizi bize iletebilirsiniz.
+          </p>
+
+          <form id="cvForm" action="/forms/cv-send" method="post" enctype="multipart/form-data" class="row g-3">
+            <div class="col-12">
+              <label for="name" class="form-label visually-hidden">Adınız</label>
+              <input type="text" name="name" id="name" placeholder="Adınız" required class="form-control">
+            </div>
+            <div class="col-12">
+              <label for="email" class="form-label visually-hidden">E-posta</label>
+              <input type="email" name="email" id="email" placeholder="E-posta" required class="form-control">
+            </div>
+            <div class="col-12">
+              <label for="phone" class="form-label visually-hidden">Telefon</label>
+              <input type="text" name="phone" id="phone" placeholder="Telefon (opsiyonel)" class="form-control">
+            </div>
+            <div class="col-12">
+              <label for="cv_file" class="form-label">CV Dosyası</label>
+              <input type="file" name="cvFile" id="cv_file" accept=".pdf,.doc,.docx" required class="form-control">
+            </div>
+            <div class="col-12">
+              <label for="section_title" class="form-label visually-hidden">Uzmanlıklarınız</label>
+              <input type="text" name="section_title" placeholder="Uzmanlıklarınız (opsiyonel)" class="form-control">
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-submit-cv">Gönder</button>
+            </div>
           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Başarı modalı -->
+  <div class="modal fade" id="cvSuccessModal" tabindex="-1" aria-labelledby="cvSuccessLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body text-center p-4">
+          <div class="mb-2">
+            <i class="bi bi-check-circle-fill" style="font-size:2.2rem; color:var(--luva-primary)"></i>
+          </div>
+          <h5 id="cvSuccessLabel" class="mb-2">CV başarıyla gönderildi</h5>
+          <p class="text-muted mb-3">CV'niz başarılı bir şekilde gönderilmiştir.</p>
+          <button id="cvSuccessOk" class="btn btn-ok" data-bs-dismiss="modal" type="button">Tamam</button>
         </div>
       </div>
     </div>
@@ -664,7 +687,60 @@
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
 
   <script src="assets/js/main.js"></script>
+  <script>
+    // CV formunun AJAX ile gönderimi (form method/action korunur)
+    (function () {
+      const cvForm = document.getElementById('cvForm');
+      if (!cvForm) return;
 
+      cvForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const submitBtn = cvForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Gönderiliyor...';
+
+        const formData = new FormData(cvForm);
+
+        try {
+          const response = await fetch(cvForm.action, {
+            method: cvForm.method || 'POST',
+            body: formData,
+          });
+
+          if (response.ok) {
+            // Mevcut CV modalını kapat ve başarı modalını aç
+            const cvModalEl = document.getElementById('cvModal');
+            const cvModalInstance = bootstrap.Modal.getInstance(cvModalEl) || new bootstrap.Modal(cvModalEl);
+            cvModalInstance.hide();
+
+            const successModalEl = document.getElementById('cvSuccessModal');
+            const successModal = new bootstrap.Modal(successModalEl);
+            successModal.show();
+
+            // Tamam butonuna basılınca ana sayfaya yönlendir
+            const okBtn = document.getElementById('cvSuccessOk');
+            okBtn.addEventListener('click', function () {
+              window.location.href = 'index.html';
+            }, { once: true });
+          } else {
+            // Hata durumu: sunucudan gelen yanıtı gösterebilirsiniz
+            let msg = 'Gönderim sırasında bir hata oluştu. Lütfen tekrar deneyin.';
+            try {
+              const json = await response.json();
+              if (json && json.message) msg = json.message;
+            } catch (err) { /* ignore */ }
+            alert(msg);
+          }
+        } catch (err) {
+          alert('Ağ hatası: ' + (err.message || err));
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      });
+    })();
+  </script>
 </body>
 
 </html>
