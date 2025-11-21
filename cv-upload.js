@@ -21,23 +21,22 @@ const router = express.Router();
 router.post('/forms/cv-send', upload.single('cvFile'), async (req, res) => {
   try {
     const db = await dbPromise; // pool
-    const { name, email, phone, section_title } = req.body;
+    const { name, email, phone, section_title, expertise } = req.body; // expertise eklendi
     const file = req.file;
     if (!file) return res.status(400).json({ ok: false, message: 'CV dosyası yok.' });
 
     const filename = file.filename;
-    // Kaydedilecek path (frontend/backend ortamına göre istenirse tam URL de saklanabilir)
     const filepath = path.join('uploads', 'cvs', filename).replace(/\\/g, '/');
 
-    // section_title formdan geliyorsa kullan; gelmiyorsa varsayılan olarak "Uzmanlıklarımız" kaydet
     const section = (section_title && section_title.toString().trim()) ? section_title.toString().trim() : 'Uzmanlıklarımız';
 
-    const sql = `INSERT INTO cvs (name, email, phone, filename, filepath, section_title) VALUES (?, ?, ?, ?, ?, ?)`;
-    const params = [name || '', email || '', phone || '', filename, filepath, section];
+    // expertise sütununu da insert'e ekliyoruz (eğer formda yoksa boş string gönder)
+    const sql = `INSERT INTO cvs (name, email, phone, filename, filepath, section_title, expertise) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const params = [name || '', email || '', phone || '', filename, filepath, section, expertise || ''];
 
     const [result] = await db.execute(sql, params);
 
-    console.log('CV kaydedildi (MySQL):', { id: result.insertId, name, email, phone, filename, filepath, section });
+    console.log('CV kaydedildi (MySQL):', { id: result.insertId, name, email, phone, filename, filepath, section, expertise });
     return res.json({ ok: true, message: 'CV gönderilmiştir.', id: result.insertId });
   } catch (err) {
     console.error('CV upload veya DB hatası:', err);
