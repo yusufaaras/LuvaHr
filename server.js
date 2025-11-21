@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs').promises;
 require('dotenv').config(); // varsa .env kullanımı
 
 // DB promise (db.js bir Promise olarak pool döndürüyor)
@@ -10,9 +11,6 @@ const app = express();
 // Middleware: body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Statik dosyaları sun (index.html proje kökündeyse)
-app.use('/', express.static(path.join(__dirname)));
 
 // Router'ı include et (mevcut upload router)
 const cvUpload = require('./cv-upload');
@@ -62,18 +60,107 @@ app.put('/api/cvs/:id', requireAdmin, async (req, res) => {
   }
 });
 
-// Kayıt silme
+// Kayıt silme - dosyayı da uploads dizininden sil
 app.delete('/api/cvs/:id', requireAdmin, async (req, res) => {
   const id = req.params.id;
+  const uploadsDir = path.resolve(path.join(__dirname, 'uploads'));
+
   try {
     const db = await dbPromise;
+
+    // İlk önce kaydın dosya yolunu al
+    const [rows] = await db.query('SELECT filename, filepath FROM cvs WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ ok: false, message: 'Kayıt bulunamadı' });
+    }
+    const row = rows[0];
+    // Dosya yolu belirle (filepath varsa onu kullan, yoksa uploads/filename)
+    let candidatePath = '';
+    if (row.filepath) {
+      candidatePath = path.resolve(path.join(__dirname, row.filepath));
+    } else if (row.filename) {
+      candidatePath = path.resolve(path.join(uploadsDir, row.filename));
+    }
+
+    // Eğer candidatePath uploads dizini içinde değilse silmeyi reddet (güvenlik)
+    let fileDeleted = false;
+    if (candidatePath) {
+      if (!candidatePath.startsWith(uploadsDir + path.sep) && candidatePath !== uploadsDir) {
+        console.warn('Dosya yolu uploads dizini dışında:', candidatePath);
+      } else {
+        try {
+          await fs.unlink(candidatePath);
+          fileDeleted = true;
+        } catch (unlinkErr) {
+          // Dosya yoksa veya silinemiyorsa, sadece uyar; yine de DB kaydını sil
+          console.warn('Dosya silinirken hata (varsa yoksa göz ardı edilecek):', unlinkErr.message);
+        }
+      }
+    }
+
+    // DB kaydını sil
     const [result] = await db.execute('DELETE FROM cvs WHERE id = ?', [id]);
-    return res.json({ ok: true, deleted: result.affectedRows || result.affected_rows || 0 });
+    return res.json({
+      ok: true,
+      deleted: result.affectedRows || result.affected_rows || 0,
+      fileDeleted
+    });
   } catch (err) {
     console.error('DB silme hatası:', err);
     return res.status(500).json({ ok: false, message: 'Silme hatası.' });
   }
 });
+
+// DOWNLOAD route: id ile çağır -> DB'den dosya yolunu çöz -> güvenli şekilde indir
+app.get('/download/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const uploadsDir = path.resolve(path.join(__dirname, 'uploads'));
+
+    const db = await dbPromise;
+    const [rows] = await db.query('SELECT filename, filepath FROM cvs WHERE id = ?', [id]);
+    if (!rows || rows.length === 0) {
+      return res.status(404).send('Kayıt/dosya bulunamadı');
+    }
+    const row = rows[0];
+
+    // Dosya yolunu belirle
+    let filePath = '';
+    let suggestedName = '';
+    if (row.filepath) {
+      filePath = path.resolve(path.join(__dirname, row.filepath));
+      // Eğer filepath son segmenti varsa onu indirme adına öner
+      suggestedName = path.basename(row.filepath);
+    } else if (row.filename) {
+      filePath = path.resolve(path.join(uploadsDir, row.filename));
+      suggestedName = row.filename;
+    } else {
+      return res.status(404).send('Dosya bilgisi yok');
+    }
+
+    // Güvenlik kontrolü: sadece uploads dizini içinden izin ver
+    if (!filePath.startsWith(uploadsDir + path.sep) && filePath !== uploadsDir) {
+      console.warn('İzin dışı dosya isteği:', filePath);
+      return res.status(400).send('İzin verilmeyen dosya yolu');
+    }
+
+    // res.download otomatik Content-Disposition koyar
+    return res.download(filePath, suggestedName, (err) => {
+      if (err) {
+        console.error('Download error', err);
+        // Eğer dosya yoksa 404 döndürelim
+        if (err.code === 'ENOENT') return res.status(404).send('Dosya bulunamadı');
+        return res.status(500).send('Dosya indirme hatası');
+      }
+    });
+  } catch (err) {
+    console.error('Download route error', err);
+    return res.status(500).send('Sunucu hatası');
+  }
+});
+
+// Statik dosyaları sun (index.html proje kökündeyse)
+app.use('/', express.static(path.join(__dirname)));
 
 // Başlangıçta (sunucu açılırken) tabloya expertise sütunu eklemeyi dene (MySQL)
 (async () => {
