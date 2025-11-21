@@ -103,22 +103,77 @@
   </style>
   <style>
     #hero {
-      /* Resminizi arka plan olarak ayarlayın. */
-      background: url('assets/img/home1.svg') center center no-repeat;
+  /* aynı dosya yolu kullandım, sadece özellikleri genişlettim */
+  background-image: url('assets/img/home1.svg');
+  background-repeat: no-repeat;
+  background-position: center center; /* merkezde tutar, medya sorgularında ayarlanıyor */
+  background-size: cover; /* alanı kaplasın */
+  -webkit-background-size: cover;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem; /* yatayda kenarlardan iç boşluk vererek taşmayı önler */
+  background-attachment: scroll; /* mobilde sabit arka plan sorunlarını önler */
+}
 
-      /* Arka plan resminin tüm alanı kaplamasını sağlar. */
-      background-size: cover;
+/* Container kenar boşluklarını kontrol et */
+#hero .container {
+  width: 100%;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
 
-      /* İçeriğin üstüne gelebilmesi için göreceli konumlandırma. */
-      position: relative;
+/* Yazıların ekran boyutuna göre ölçeklenmesi */
+#hero h1 {
+  margin: 0 0 0.5rem 0;
+  line-height: 1.05;
+  /* clamp ile küçük ekranlarda küçülür, büyük ekranda büyür */
+  font-size: clamp(1.6rem, 4vw, 3rem);
+}
 
-      /* Ekranı tam kaplaması için minimum yükseklik (örnek: tam ekran yüksekliği). */
-      min-height: 100vh;
+#hero p {
+  margin: 0;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+}
 
-      /* İçerik ve arka plan arasında dikey hizalama. */
-      display: flex;
-      align-items: center;
-    }
+/* Küçük ekranlar için arka plan pozisyonu ve yükseklik ayarları */
+@media (max-width: 992px) {
+  #hero {
+    /* Görüntünün mobilde önemli kısmı görünmesi için biraz yukarı kaydırabiliriz */
+    background-position: center 30%;
+    min-height: 75vh; /* çok yer kaplamasın, içerik görünür kalsın */
+    padding: 2.5rem 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  #hero {
+    background-position: center 30%;
+    min-height: 65vh;
+    padding: 2rem 0.75rem;
+  }
+  /* Flex içindeki düzen küçük ekranda dikey olabilir */
+  #hero .d-flex {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #hero {
+    background-position: center 20%;
+    min-height: 55vh;
+    padding: 1.5rem 0.75rem;
+  }
+  #hero h1 {
+    font-size: 1.4rem;
+  }
+  #hero p {
+    font-size: 0.95rem;
+  }
+}
   </style>
 
 </head>
